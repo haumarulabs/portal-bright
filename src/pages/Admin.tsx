@@ -26,22 +26,10 @@ export default function Admin() {
 
   const checkAdminAccess = async () => {
     try {
-      // Check if OTP was verified
-      const otpAuth = sessionStorage.getItem("admin_otp_auth");
-      if (otpAuth !== "verified") {
-        navigate("/admin-auth");
-        return;
-      }
-      
       const user = await api.whoami();
-      // Only allow specific email with OTP verification
-      if (user.user?.email !== "ahmadraheel@haumarulabs.co.nz") {
-        toast({
-          title: "Access Denied",
-          description: "You don't have admin privileges",
-          variant: "destructive",
-        });
-        navigate("/dashboard");
+      // Cloudflare handles authentication, just check if user exists
+      if (!user.user) {
+        navigate("/login");
       }
     } catch (error) {
       navigate("/login");
