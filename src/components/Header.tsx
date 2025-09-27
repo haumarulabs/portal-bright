@@ -27,7 +27,7 @@ export function Header() {
   };
 
   const handleAdminAccess = () => {
-    navigate("/admin");
+    navigate("/admin-auth");
   };
 
   return (

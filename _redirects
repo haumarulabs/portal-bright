@@ -1,0 +1,11 @@
+# Netlify redirects file
+# This file is for Netlify deployments
+
+# Redirect root to dashboard
+/  /dashboard  302
+
+# API proxy (if needed)
+/api/*  https://your-api-domain.com/api/:splat  200
+
+# SPA fallback - this should be last
+/*  /index.html  200

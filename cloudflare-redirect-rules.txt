@@ -1,0 +1,43 @@
+# Cloudflare Page Rules / Redirect Rules Configuration
+# Add these rules in Cloudflare Dashboard -> Rules -> Page Rules or Redirect Rules
+
+## Option 1: Using Page Rules (Classic)
+# URL: yourdomain.com/
+# Setting: Forwarding URL
+# Status Code: 302 - Temporary Redirect
+# Destination URL: https://yourdomain.com/dashboard
+
+## Option 2: Using Redirect Rules (Recommended)
+# Go to Cloudflare Dashboard -> Rules -> Redirect Rules
+# Create a new rule with:
+# Name: Redirect Root to Dashboard
+# When incoming requests match:
+#   - Field: URI Path
+#   - Operator: equals
+#   - Value: /
+# Then:
+#   - Type: Dynamic
+#   - Expression: concat("https://", http.host, "/dashboard")
+#   - Status code: 302
+
+## Option 3: Using Cloudflare Workers (Advanced)
+# Create a Worker with this code:
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  const url = new URL(request.url)
+  
+  // Redirect root to dashboard
+  if (url.pathname === '/') {
+    return Response.redirect(url.origin + '/dashboard', 302)
+  }
+  
+  // Pass through all other requests
+  return fetch(request)
+}
+
+## Additional Security Rule for Admin
+# Add IP restriction or Cloudflare Access policy for /admin and /admin-auth paths
+# This provides an additional layer of security beyond the OTP
