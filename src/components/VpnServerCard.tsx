@@ -6,8 +6,19 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { api } from "@/services/api";
 
 export function VpnServerCard() {
-  const handleDownloadProfile = () => {
-    api.downloadVPNProfile();
+  const handleDownloadProfile = async () => {
+    // Get user email as CN from profile
+    try {
+      const profile = await api.getProfile();
+      if (profile.user?.email) {
+        api.downloadVPNProfile(profile.user.email);
+      } else {
+        // Fallback if no email available
+        api.downloadVPNProfile('default');
+      }
+    } catch (error) {
+      console.error('Failed to download VPN profile:', error);
+    }
   };
   return (
     <Card className="overflow-hidden">

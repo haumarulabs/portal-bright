@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 interface PlanFeature {
   text: string;
@@ -11,15 +12,21 @@ interface PlanFeature {
 }
 
 interface PricingPlan {
+  id?: string;
+  code?: string;
   name: string;
   price: number;
+  price_usd?: number;
+  days?: number;
   duration: string;
   description: string;
   features: PlanFeature[];
+  is_active?: boolean;
   isBestValue?: boolean;
 }
 
-const plans: PricingPlan[] = [
+// Default plans if API doesn't return any
+const defaultPlans: PricingPlan[] = [
   {
     name: "Weekly",
     price: 20,
@@ -63,19 +70,49 @@ const plans: PricingPlan[] = [
 ];
 
 export function PricingPlans() {
-  const handleSelectPlan = async (planName: string) => {
+  // Fetch plans from API
+  const { data: apiPlans } = useQuery({
+    queryKey: ['plans'],
+    queryFn: api.getPlans,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  // Transform API plans or use defaults
+  const plans: PricingPlan[] = apiPlans?.plans ? apiPlans.plans.map((plan: any) => ({
+    id: plan.id,
+    code: plan.code,
+    name: plan.code === 'weekly' ? 'Weekly' : plan.code === 'biweekly' ? 'Bi-Weekly' : 'Monthly',
+    price: plan.price_usd,
+    price_usd: plan.price_usd,
+    days: plan.days,
+    duration: `${plan.days} Days Access`,
+    description: plan.days <= 7 ? 'Perfect for short-term projects' : 
+                 plan.days <= 15 ? 'Most popular choice' : 
+                 'Best for ongoing training',
+    features: [
+      { text: "Full Red Team Lab Access", included: true },
+      { text: "All VPN Profiles", included: true },
+      { text: "24/7 Lab Availability", included: true },
+      { text: plan.days <= 7 ? "Basic Support" : plan.days <= 15 ? "Priority Support" : "Premium Support", included: true },
+      { text: "All Tools Access", included: true },
+    ],
+    is_active: plan.is_active,
+    isBestValue: plan.days === 15
+  })) : defaultPlans;
+
+  const handleSelectPlan = async (planCode: string) => {
     try {
-      const response = await api.selectPlan(planName.toLowerCase());
+      const response = await api.selectPlan(planCode.toLowerCase());
       if (response.success) {
         toast({
           title: "Plan Selected",
-          description: `You have successfully selected the ${planName} plan.`,
+          description: `You have successfully selected the ${planCode} plan.`,
         });
       } else {
         toast({
-          title: "Error",
-          description: response.message || "Failed to select plan",
-          variant: "destructive",
+          title: "Notice",
+          description: response.message || "Payment integration pending",
+          variant: "default",
         });
       }
     } catch (error) {
