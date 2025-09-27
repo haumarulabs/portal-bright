@@ -12,7 +12,7 @@ const Index = () => {
         <p className="text-xl text-muted-foreground mb-8">
           Access your student portal and manage your learning journey
         </p>
-        <Link to="/portal">
+        <Link to="/dashboard">
           <Button className="bg-gradient-primary text-primary-foreground hover:opacity-90">
             Go to Student Portal
             <ArrowRight className="ml-2 h-4 w-4" />
