@@ -1,28 +1,35 @@
-import { Bell, Settings, Globe, LogOut } from "lucide-react";
+import { Bell, Settings, Globe, LogOut, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export function Header() {
   const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await api.whoami();
+        setUser(userData.user);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+    fetchUser();
+  }, []);
   
   const handleLogout = async () => {
-    try {
-      await api.logout();
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out.",
-      });
-      navigate("/");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to logout",
-        variant: "destructive",
-      });
-    }
+    // Clear auth and redirect to Cloudflare logout
+    await api.logout();
   };
+
+  const handleAdminAccess = () => {
+    navigate("/admin");
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="flex h-16 items-center px-6">
@@ -48,6 +55,16 @@ export function Header() {
           </Button>
           
           <div className="h-6 w-px bg-border" />
+          
+          {user?.is_admin && (
+            <>
+              <Button variant="ghost" className="gap-2" onClick={handleAdminAccess}>
+                <ShieldCheck className="h-4 w-4" />
+                Admin
+              </Button>
+              <div className="h-6 w-px bg-border" />
+            </>
+          )}
           
           <Button variant="ghost" className="gap-2" onClick={handleLogout}>
             <LogOut className="h-4 w-4" />
