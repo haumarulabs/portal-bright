@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: nginx:alpine
+    container_name: student-portal-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./dist:/usr/share/nginx/html:ro
+      - ./nginx-docker.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - fastapi
+    networks:
+      - portal-network
+
+  fastapi:
+    image: your-fastapi-image  # Replace with your FastAPI image
+    container_name: student-portal-api
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=your_database_url
+      - SECRET_KEY=your_secret_key
+    networks:
+      - portal-network
+
+networks:
+  portal-network:
+    driver: bridge
