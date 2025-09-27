@@ -1,7 +1,28 @@
 import { Bell, Settings, Globe, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { api } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export function Header() {
+  const navigate = useNavigate();
+  
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to logout",
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="flex h-16 items-center px-6">
@@ -28,7 +49,7 @@ export function Header() {
           
           <div className="h-6 w-px bg-border" />
           
-          <Button variant="ghost" className="gap-2">
+          <Button variant="ghost" className="gap-2" onClick={handleLogout}>
             <LogOut className="h-4 w-4" />
             Logout
           </Button>

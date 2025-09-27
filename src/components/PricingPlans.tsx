@@ -2,6 +2,8 @@ import { Check, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { api } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
 
 interface PlanFeature {
   text: string;
@@ -61,6 +63,29 @@ const plans: PricingPlan[] = [
 ];
 
 export function PricingPlans() {
+  const handleSelectPlan = async (planName: string) => {
+    try {
+      const response = await api.selectPlan(planName.toLowerCase());
+      if (response.success) {
+        toast({
+          title: "Plan Selected",
+          description: `You have successfully selected the ${planName} plan.`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to select plan",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to connect to server",
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
@@ -102,6 +127,7 @@ export function PricingPlans() {
               </div>
               
               <Button
+                onClick={() => handleSelectPlan(plan.name)}
                 className={`w-full ${
                   plan.isBestValue
                     ? "bg-gradient-primary text-primary-foreground hover:opacity-90"

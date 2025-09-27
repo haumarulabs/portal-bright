@@ -3,10 +3,17 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Progress } from "@/components/ui/progress";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/services/api";
 
 export function SubscriptionCard() {
-  const daysRemaining = 45;
-  const totalDays = 365;
+  const { data: subscription, isLoading } = useQuery({
+    queryKey: ['subscription'],
+    queryFn: api.getSubscription,
+  });
+
+  const daysRemaining = subscription?.days_remaining || 0;
+  const totalDays = subscription?.total_days || 365;
   const progressPercentage = ((totalDays - daysRemaining) / totalDays) * 100;
 
   return (
@@ -27,7 +34,7 @@ export function SubscriptionCard() {
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
             <span className="text-white/80">Current Plan</span>
-            <span className="font-semibold text-white">Premium Annual</span>
+            <span className="font-semibold text-white">{subscription?.plan_name || 'Premium Annual'}</span>
           </div>
           
           <div className="space-y-2">
@@ -41,11 +48,11 @@ export function SubscriptionCard() {
           <div className="grid grid-cols-2 gap-3 pt-2">
             <div className="text-sm">
               <span className="text-white/60">Started</span>
-              <p className="text-white font-medium">Jan 1, 2024</p>
+              <p className="text-white font-medium">{subscription?.start_date || 'Jan 1, 2024'}</p>
             </div>
             <div className="text-sm text-right">
               <span className="text-white/60">Expires</span>
-              <p className="text-white font-medium">Dec 31, 2024</p>
+              <p className="text-white font-medium">{subscription?.end_date || 'Dec 31, 2024'}</p>
             </div>
           </div>
         </div>

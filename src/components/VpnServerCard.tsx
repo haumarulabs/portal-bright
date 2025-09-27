@@ -3,8 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { api } from "@/services/api";
 
 export function VpnServerCard() {
+  const handleDownloadProfile = () => {
+    api.downloadVPNProfile();
+  };
   return (
     <Card className="overflow-hidden">
       <div className="p-6 border-b border-border">
@@ -49,7 +53,10 @@ export function VpnServerCard() {
             </div>
           </div>
           
-          <Button className="w-full bg-gradient-success text-success-foreground hover:opacity-90">
+          <Button 
+            onClick={handleDownloadProfile}
+            className="w-full bg-gradient-success text-success-foreground hover:opacity-90"
+          >
             <Download className="h-4 w-4 mr-2" />
             Download Profile
           </Button>
