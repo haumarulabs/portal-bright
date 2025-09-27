@@ -42,8 +42,8 @@ export const api = {
 
   logout: async () => {
     api.clearAuthToken();
-    // Redirect to login or portal
-    window.location.href = '/portal';
+    // Redirect to Cloudflare logout
+    window.location.href = 'https://register.haumaruacademy.org/cdn-cgi/access/logout';
   },
 
   // Get current user info
